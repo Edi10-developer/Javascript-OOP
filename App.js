@@ -16,39 +16,62 @@ class UI {
             <strong>Product Name: </strong> ${product.name}
             <strong>Product Price: </strong> ${product.price}
             <strong>Product Year: </strong> ${product.year}
+            <a href="#" class="btn btn-danger" name="delete">Delete</a>
           </div>
         </div>
         `;
         productList.appendChild(element);
-
     }
 
-    deleteProduct() {
-
+    deleteProduct(element) {
+        if (element.name === 'delete') {
+            element.parentElement.parentElement.parentElement.remove();
+        }
+        this.showMessage("Product deleted successfully", 'warning')
     }
 
-    showMessage() {
 
+    showMessage(message, cssClass) {
+        const div     = document.createElement('div');
+        div.className = `alert alert-${cssClass}`;
+        div.appendChild(document.createTextNode(message))
+        // Showing message in DOM
+        const container = document.querySelector('.container');
+        const app       = document.querySelector('#App');
+        container.insertBefore(div, app);
+        setTimeout(() => {
+            document.querySelector('.alert').remove();
+        }, 3000);
     }
 }
 
 // DOM Events
 document.getElementById("product_form")
     .addEventListener("submit", (e) => {
-        const name  = document.getElementById('name').value;
+        const name = document.getElementById('name').value;
         const price = document.getElementById('price').value;
-        const year  = document.getElementById('year').value;
-        
-        e.preventDefault(); 
+        const year = document.getElementById('year').value;
+
+        e.preventDefault();
 
         console.log(name, price, year);
 
         const product = new Product(name, price, year);
         const ui      = new UI();
-        ui.addProduct(product);
-        ui.resetForm()<
 
+        if(name === '' || price === '' || year === ''){
+           return ui.showMessage("Complete fields please", "danger")
+        }
+        ui.addProduct(product);
+        resetForm();
+        ui.showMessage('Product added successfully', 'success')
     })
-    resetForm() {
-        document.getElementById("product_form").reset();
-    };
+
+const resetForm = () => {
+    document.getElementById("product_form").reset();
+};
+
+document.getElementById("product_list").addEventListener("click", (e) => {
+    const ui = new UI();
+    ui.deleteProduct(e.target);
+})
